@@ -16,8 +16,10 @@ const Home = () => {
 
 	function handelSearch(e) {
 		setSearchResults(
-			data.filter((item) =>
-				item.name.toLowerCase().includes(e.target.value.toLowerCase())
+			data.filter(
+				(item) =>
+					item.name.toLowerCase().includes(e.target.value.toLowerCase()) ||
+					item.username.toLowerCase().includes(e.target.value.toLowerCase())
 			)
 		);
 	}
