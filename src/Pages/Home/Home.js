@@ -5,7 +5,8 @@ import { useApi } from "lib/hooks";
 import Modal from "Component/EditComponent/EditComponent";
 import SearchComponent from "Component/SearchComponent/SearchComponent";
 import { Loading } from "Component/utils/Loading";
-// import ReactPaginate from "react-paginate";
+import ReactPaginate from "react-paginate";
+
 const Home = () => {
 	const { data, isLoading, error } = useApi(
 		"https://jsonplaceholder.typicode.com/users"
@@ -16,11 +17,12 @@ const Home = () => {
 
 	function handelSearch(e) {
 		setSearchResults(
-			data.filter(
-				(item) =>
+			data.filter((item) => {
+				item.company.toLowerCase().includes(e.target.value.toLowerCase()) ||
+					item.email.toLowerCase().includes(e.target.value.toLowerCase()) ||
 					item.name.toLowerCase().includes(e.target.value.toLowerCase()) ||
-					item.username.toLowerCase().includes(e.target.value.toLowerCase())
-			)
+					item.username.toLowerCase().includes(e.target.value.toLowerCase());
+			})
 		);
 	}
 
@@ -37,38 +39,42 @@ const Home = () => {
 		{ title: "Email" },
 		{ title: "Address" },
 		{ title: "Phone" },
-		{ title: "compony" },
+		{ title: "company" },
 		{ title: "Edit" },
 	];
 	if (isLoading) {
 		return (
 			<div className=" flex justify-center mt-[200px]">
-				loading...
+				Loading...
 				<Loading />
 			</div>
 		);
 	}
 	if (error) {
-		return <div className=" ">...error</div>;
+		return (
+			<div className="flex justify-center mt-64 text-red-900 text-[50px]">
+				404.Data Not Found
+			</div>
+		);
 	}
+	let itemsPerPage = 5;
+	const [currentItems, setCurrentItems] = useState(null);
+	const [pageCount, setPageCount] = useState(0);
+	const [itemOffset, setItemOffset] = useState(0);
+	const items = [1, 2];
 
-	// const items = [1, 2];
-	// const [pageCount, setPageCount] = useState(0);
-	// const [itemOffset, setItemOffset] = useState(0);
-	// const [currentItems, setCurrentItems] = useState(null);
-	// useEffect(() => {
-	// 	let itemsPerPage = 5;
-	// 	const endOffset = itemOffset + itemsPerPage;
-	// 	console.log(`Loading items from ${itemOffset} to ${endOffset}`);
-	// 	setCurrentItems(user.slice(itemOffset, endOffset));
-	// 	setPageCount(Math.ceil(user.length / itemsPerPage));
-	// }, [user, itemOffset, itemsPerPage]);
+	useEffect(() => {
+		const endOffset = itemOffset + itemsPerPage;
+		console.log(`Loading items from ${itemOffset} to ${endOffset}`);
+		setCurrentItems(user.slice(itemOffset, endOffset));
+		setPageCount(Math.ceil(user.length / itemsPerPage));
+	}, [user, itemOffset, itemsPerPage]);
 
-	// const handlePageClick = (event) => {
-	// 	const newOffset = (event.selected * itemsPerPage) % user.length;
+	const handlePageClick = (event) => {
+		const newOffset = (event.selected * itemsPerPage) % user.length;
+		setItemOffset(newOffset);
+	};
 
-	// 	setItemOffset(newOffset);
-	// };
 	return (
 		<div>
 			<div>
@@ -128,6 +134,25 @@ const Home = () => {
 							</table>
 						</div>
 					</div>
+					<ReactPaginate
+						breakLabel="..."
+						nextLabel={">>"}
+						onPageChange={handlePageClick}
+						pageRangeDisplayed={3}
+						pageCount={pageCount}
+						previousLabel={"<<"}
+						renderOnZeroPageCount={null}
+						breakClassName="m-x-0 m-y-5 h-[35px] border-none"
+						breakLinkClassName="bg-teal-200 border-teal-700 text-teal-900 ml-[3px] rounded-full"
+						containerClassName="flex justify-center ml-[20%] "
+						activeClassName="active"
+						pageClassName="m-x-0 m-y-5 h-[35px] border-none"
+						pageLinkClassName="bg-teal-200 border-teal-700 text-teal-900 ml-[3px] rounded-full"
+						previousClassName="m-x-0 m-y-5 h-[35px] border-none"
+						previousLinkClassName="bg-teal-200 border-teal-700 text-teal-900 ml-[3px] rounded-full"
+						nextClassName="m-x-0 m-y-5 h-[35px] border-none"
+						nextLinkClassName="bg-teal-200 border-teal-700 text-teal-900 ml-[3px] rounded-full"
+					/>
 				</div>
 			</div>
 		</div>
